@@ -55,7 +55,8 @@ namespace DepthQuotesProducer.Binance
                 {
                     var receivedJson = Encoding.UTF8.GetString(buffer);
 
-                    // I spent 4 hours to get why Binance sends invalid jsons, in fact method ReceiveAsync doesn't clean buffer and it leads to extra symbols at the end
+                    // I spent 4 hours to get why Binance sends invalid jsons, in fact method ReceiveAsync doesn't clean buffer and it leads to extra symbols at the end.
+                    // If we always allocate new array memory consumption grows very fast
                     Array.Clear(buffer, 0, buffer.Length);
 
                     try
