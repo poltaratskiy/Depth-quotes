@@ -1,4 +1,4 @@
-﻿using Abstractions.CommonObjects;
+﻿using Abstractions.ProducerConsumerDto;
 using System.Threading;
 using System.Threading.Tasks;
 

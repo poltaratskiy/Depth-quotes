@@ -8,8 +8,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{28D2D30B-5930-4FD9-97D7-F1E4BCA3D340}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
+		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		docker-compose.yml = docker-compose.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepthQuotesProducer", "DepthQuotesProducer\DepthQuotesProducer.csproj", "{B324A928-01D2-4283-98D1-2C77F4D59837}"

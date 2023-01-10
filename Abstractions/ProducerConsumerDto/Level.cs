@@ -1,4 +1,4 @@
-﻿namespace Abstractions.CommonObjects
+﻿namespace Abstractions.ProducerConsumerDto
 {
     public class Level
     {

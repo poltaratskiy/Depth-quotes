@@ -1,4 +1,4 @@
-﻿using Abstractions.CommonObjects;
+﻿using Abstractions.ProducerConsumerDto;
 using Abstractions.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +54,8 @@ namespace DepthQuotesConsumer.Controllers
                 {
                     // Explanation: Producer serializes Quotes to json, consumer obtains and deserializes then serializes again.
                     // Producer could send it in json format and consumer could send it as is but in real projects it is highly likely to make convertations, add logic and etc.
-                    var serializedBytes = JsonSerializer.SerializeToUtf8Bytes(args.Quote);
+                    var webApiQuotes = args.Quote.ToWebApiQuote();
+                    var serializedBytes = JsonSerializer.SerializeToUtf8Bytes(webApiQuotes);
 
                     // _webSocket is marked by ! because it has been already created before subscribing the event
                     return _webSocket!.SendAsync(serializedBytes, WebSocketMessageType.Text, true, default);

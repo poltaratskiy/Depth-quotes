@@ -1,4 +1,4 @@
-using Abstractions.CommonObjects;
+using Abstractions.ProducerConsumerDto;
 using DepthQuotesProducer.Binance;
 using NUnit.Framework;
 using Shouldly;
@@ -45,13 +45,13 @@ namespace DepthQuotesProducer.Tests.MappingFromBinance
                 new Level(0.01618900M, 0.37600000M),
             };
 
-            var expectedQuote = new Abstractions.CommonObjects.Quote("BNBBTC", expectedBids, expectedAsks);
+            var expectedQuote = new Abstractions.ProducerConsumerDto.Quote("BNBBTC", expectedBids, expectedAsks);
             var actualQuote = binanceQuote.ToAbstractionsQuote("BNBBTC");
 
             QuotesAreEqual(actualQuote, expectedQuote).ShouldBeTrue();
         }
 
-        private bool QuotesAreEqual(Abstractions.CommonObjects.Quote? actualQuote, Abstractions.CommonObjects.Quote? expectedQuote)
+        private bool QuotesAreEqual(Abstractions.ProducerConsumerDto.Quote? actualQuote, Abstractions.ProducerConsumerDto.Quote? expectedQuote)
         {
             if (actualQuote == null || expectedQuote == null)
             {

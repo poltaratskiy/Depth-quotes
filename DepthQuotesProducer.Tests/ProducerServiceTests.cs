@@ -1,4 +1,4 @@
-﻿using Abstractions.CommonObjects;
+﻿using Abstractions.ProducerConsumerDto;
 using Abstractions.Interfaces;
 using DepthQuotesProducer.Services;
 using Microsoft.Extensions.Logging;

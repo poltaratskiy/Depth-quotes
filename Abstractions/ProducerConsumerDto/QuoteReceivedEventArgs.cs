@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Abstractions.CommonObjects
+namespace Abstractions.ProducerConsumerDto
 {
     public class QuoteReceivedEventArgs : EventArgs
     {

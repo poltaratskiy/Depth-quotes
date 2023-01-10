@@ -1,4 +1,4 @@
-﻿using Abstractions.ProducerConsumerDto;
+﻿using Abstractions.WebApi;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

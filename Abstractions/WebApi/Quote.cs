@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 
-namespace Abstractions.CommonObjects
+namespace Abstractions.WebApi
 {
     public class Quote
     {
-        public Quote (string symbol, IEnumerable<Level> bids, IEnumerable<Level> asks)
+        public Quote (string channel, IEnumerable<Level> bids, IEnumerable<Level> asks)
         {
-            Symbol = symbol;
+            Channel = channel;
             Bids = bids;
             Asks = asks;
         }
 
-        /// <summary> Symbol in upper case. </summary>
-        public string Symbol { get; }
+        /// <summary> Channel. </summary>
+        public string Channel { get; }
 
         /// <summary> Orders for buy. </summary>
         public IEnumerable<Level> Bids { get; }
