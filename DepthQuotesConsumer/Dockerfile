@@ -19,10 +19,3 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "DepthQuotesConsumer.dll"]
-
-#FROM mcr.microsoft.com/dotnet/sdk:6.0
-#WORKDIR /app
-#EXPOSE 8080
-#COPY . .
-#RUN dotnet restore
-#ENTRYPOINT ["dotnet", "run"]
