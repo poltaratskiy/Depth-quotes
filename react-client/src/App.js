@@ -26,6 +26,8 @@ function App() {
         )
       });
 
+      // I used sorting in client side because it is responsible of client app to display data in correct way.
+      // But in case if that api is used only for displaying stock glass, sorting might be carried to backend side
       var sortedAsks = json.Asks.sort((a, b) => b.Price - a.Price);
       asks = sortedAsks.map((item) => {
         return (
