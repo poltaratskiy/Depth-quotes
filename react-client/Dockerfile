@@ -31,6 +31,9 @@ COPY react-client/ .
 # Same as npm install
 RUN npm install
 
+ARG REACT_APP_WS_URL
+ENV REACT_APP_WS_URL $REACT_APP_WS_URL
+
 COPY . /app
 
 CMD [ "npm", "start" ]

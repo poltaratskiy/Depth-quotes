@@ -36,8 +36,8 @@ services:
     build:
       context: .
       dockerfile: react-client/Dockerfile
-    environment:
-      REACT_APP_WS_URL: "ws://localhost:8080/ws/depthquotes"
+      args:
+        REACT_APP_WS_URL: "ws://localhost:8080/ws/depthquotes"
     ports:
       - "3000:80"
     depends_on:

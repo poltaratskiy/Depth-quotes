@@ -8,7 +8,6 @@ var bids;
 var asks;
 
 function App() {
-  console.log(process.env);
   useWebSocket(process.env.REACT_APP_WS_URL, {
     onOpen: () => {
       console.log('WebSocket connection established.');
