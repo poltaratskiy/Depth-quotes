@@ -30,7 +30,14 @@ Client app:
 * take attention to code structure and code quality
 
 ### Architecture
+
+![alt text](ArchitectureDiagram.png)
+
 I used layered architecture with dividing into zones of responsibility to provide flexibility and scalability if new features needed to be added.
 I relied mostly on KISS and Single Responsibility Principle of SOLID as fundamentals in my opinion.
 Project Abstractions is like client library for exchanging messages between services, it contains objects that are serialized by producer and deserialized by consumer.
 I used common interfaces for producer and consumer so they might be changed, it is possible to use another exchange instead of Binance or another transport instead of Nats.
+
+### Might be added
+* Configuration settings for switching between 100 and 1000 ms intervals of getting quotes;
+* Scalability, using multiple instances of services. For example using Redis to store the names of pods that consume and produce quotes to ensure that only one instance is getting quotes of a particular symbol from the exchange at a time.
