@@ -58,7 +58,17 @@ namespace DepthQuotesProducer.NatsProducer
             return Task.CompletedTask;
         }
 
+        // https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync
         public async ValueTask DisposeAsync()
+        {
+            // Perform async cleanup.
+            await DisposeAsyncCore();
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
         {
             await CloseConnectionAsync(default);
         }

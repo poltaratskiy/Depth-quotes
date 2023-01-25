@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using NATS.Client;
 using System;
 using System.Text.Json;
+using System.Runtime.Intrinsics.X86;
 
 namespace DepthQuotesConsumer
 {
@@ -18,6 +19,8 @@ namespace DepthQuotesConsumer
         private readonly IAsyncSubscription _subscription;
         private readonly ILogger _logger;
         private readonly NatsConfiguration _natsConfiguration;
+
+        private bool _disposed;
 
         public NatsConsumer(ILogger<NatsConsumer> logger, IConnectionFactory connectionFactory, IOptions<NatsConfiguration> natsConfigurationOptions)
         {
@@ -50,14 +53,54 @@ namespace DepthQuotesConsumer
 
         public void Dispose()
         {
+            Dispose(true);
+
+            // https://learn.microsoft.com/en-us/dotnet/api/system.idisposable.dispose?view=net-7.0
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SuppressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                // dispose managed state (managed objects). No need to dispose managed object because there are object resolved with DI.
+            }
+
+            // free unmanaged resources (unmanaged objects) and override a finalizer below.
+            // set large fields to null.
             _subscription?.Unsubscribe();
             if (_connection != null)
             {
                 _connection.Close();
                 _connection.Dispose();
+
+                _logger.LogInformation("Connection to Nats closed");
             }
 
-            _logger.LogInformation("Connection to Nats closed");
+            _disposed = true;
+        }
+
+        // Use C# finalizer syntax for finalization code.
+        // This finalizer will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide finalizer in types derived from this class.
+        ~NatsConsumer()
+        {
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(disposing: false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(disposing: false);
         }
     }
 }

@@ -16,6 +16,8 @@ namespace DepthQuotesConsumer.Controllers
         private readonly IConsumer _consumer;
         private WebSocket? _webSocket;
 
+        private bool _disposed;
+
         public QuotesWebSocketController(ILogger<QuotesWebSocketController> logger, IConsumer consumer)
         {
             _logger = logger;
@@ -60,8 +62,30 @@ namespace DepthQuotesConsumer.Controllers
 
         public void Dispose()
         {
-            _consumer.QuoteReceived -= QuoteReceived;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _consumer.QuoteReceived -= QuoteReceived;
+            }
+
             _webSocket?.Dispose();
+
+            _disposed = true;
+        }
+
+        ~QuotesWebSocketController()
+        {
+            Dispose(false);
         }
     }
 }

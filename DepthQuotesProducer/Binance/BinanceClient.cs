@@ -88,12 +88,22 @@ namespace DepthQuotesProducer.Binance
             _logger.LogInformation("Binance connection closed");
         }
 
-        async ValueTask IAsyncDisposable.DisposeAsync()
+        // https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync
+        public async ValueTask DisposeAsync()
+        {
+            // Perform async cleanup.
+            await DisposeAsyncCore();
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
         {
             // use dispose to close connection for situations for example when app is stopped but method CloseConnectionAsync was not called
             if (client != null)
             {
-                await CloseConnectionAsync(default);
+                await CloseConnectionAsync(default).ConfigureAwait(false);
                 client.Dispose();
             }
         }
