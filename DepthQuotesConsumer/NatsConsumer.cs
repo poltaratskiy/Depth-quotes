@@ -1,12 +1,11 @@
-﻿using Abstractions.ProducerConsumerDto;
-using Abstractions.Interfaces;
+﻿using Abstractions.Interfaces;
+using Abstractions.ProducerConsumerDto;
 using DepthQuotesConsumer.Config;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NATS.Client;
 using System;
 using System.Text.Json;
-using System.Runtime.Intrinsics.X86;
 
 namespace DepthQuotesConsumer
 {
