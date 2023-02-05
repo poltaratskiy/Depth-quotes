@@ -45,18 +45,15 @@ namespace DepthQuotesConsumer.Controllers
             }
         }
 
-        private void QuoteReceived(Quote quote)
+        private Task QuoteReceived(Quote quote)
         {
-            Task.Run(() =>
-            {
-                // Explanation: Producer serializes Quotes to json, consumer obtains and deserializes then serializes again.
-                // Producer could send it in json format and consumer could send it as is but in real projects it is highly likely to make convertations, add logic and etc.
-                var webApiQuotes = quote.ToWebApiQuote();
-                var serializedBytes = JsonSerializer.SerializeToUtf8Bytes(webApiQuotes);
+            // Explanation: Producer serializes Quotes to json, consumer obtains and deserializes then serializes again.
+            // Producer could send it in json format and consumer could send it as is but in real projects it is highly likely to make convertations, add logic and etc.
+            var webApiQuotes = quote.ToWebApiQuote();
+            var serializedBytes = JsonSerializer.SerializeToUtf8Bytes(webApiQuotes);
 
-                // _webSocket is marked by ! because it has been already created before subscribing the event
-                return _webSocket!.SendAsync(serializedBytes, WebSocketMessageType.Text, true, default);
-            }).ConfigureAwait(false);
+            // _webSocket is marked by ! because it has been already created before subscribing the event
+            return _webSocket!.SendAsync(serializedBytes, WebSocketMessageType.Text, true, default);
         }
 
         public void Dispose()

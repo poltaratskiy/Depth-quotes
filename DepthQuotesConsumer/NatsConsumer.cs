@@ -30,19 +30,18 @@ namespace DepthQuotesConsumer
             _connectionFactory = connectionFactory;
         }
 
-        /// <inheritdoc/>
-        public Task ConnectAsync(Action<Quote> quoteReceived, CancellationToken cancellationToken = default)
+        public Task ConnectAsync(Func<Quote, Task> quoteReceived, CancellationToken cancellationToken = default)
         {
             _connection = _connectionFactory.CreateConnection(_natsConfiguration.Url);
             _logger.LogInformation("Connected to Nats");
 
-            _subscription = _connection.SubscribeAsync(_natsConfiguration.Channel, (sender, args) =>
+            _subscription = _connection.SubscribeAsync(_natsConfiguration.Channel, async (sender, args) =>
             {
                 var quote = JsonSerializer.Deserialize<Quote>(args.Message.Data);
 
                 if (quote != null)
                 {
-                    quoteReceived.Invoke(quote);
+                    await quoteReceived.Invoke(quote);
                 }
             });
             _subscription.Start();
