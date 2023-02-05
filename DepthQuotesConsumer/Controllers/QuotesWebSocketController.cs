@@ -1,5 +1,5 @@
-﻿using Abstractions.ProducerConsumerDto;
-using Abstractions.Interfaces;
+﻿using Abstractions.Interfaces;
+using Abstractions.ProducerConsumerDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -7,7 +7,6 @@ using System;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace DepthQuotesConsumer.Controllers
 {
