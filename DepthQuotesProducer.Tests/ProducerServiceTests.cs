@@ -18,15 +18,23 @@ namespace DepthQuotesProducer.Tests
         [Test]
         public async Task ProducerService_StartAsync_Should_ConnectClientAndProducer()
         {
-            var exchangeClientMock = new Mock<IExchangeClient>();
-            exchangeClientMock.Setup(x => x.ConnectAsync(default))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
-
             var producerMock = new Mock<IProducer>();
             producerMock.Setup(x => x.ConnectAsync(default))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
+
+            producerMock.Setup(x => x.SendQuoteAsync(It.IsAny<Quote>(), default))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var quoteToSend = new Quote("SYMBOL", Enumerable.Empty<Level>(), Enumerable.Empty<Level>());
+
+            var exchangeClientMock = new Mock<IExchangeClient>();
+            exchangeClientMock.Setup(x => x.ConnectAsync((q) => producerMock.Object.SendQuoteAsync(q, default), default))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            
 
             var producerService = new ProducerService(_logger, exchangeClientMock.Object, producerMock.Object);
             await producerService.StartAsync(default);
@@ -57,40 +65,6 @@ namespace DepthQuotesProducer.Tests
 
             producerMock.VerifyAll();
             producerMock.VerifyNoOtherCalls();
-        }
-
-        [Test]
-        public async Task ProducerService_ExchangeSendsQuote_Should_CallSendQuotesFromProducer()
-        {
-            var exchangeClientMock = new Mock<IExchangeClient>();
-            exchangeClientMock.Setup(x => x.ConnectAsync(default))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
-
-            var producerMock = new Mock<IProducer>();
-            producerMock.Setup(x => x.ConnectAsync(default))
-                .Returns(Task.CompletedTask);
-
-            Quote? sentQuote = null;
-            producerMock.Setup(x => x.SendQuoteAsync(It.IsAny<Quote>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Callback<Quote, CancellationToken>((q, c) => sentQuote = q)
-                .Verifiable();
-
-            var producerService = new ProducerService(_logger, exchangeClientMock.Object, producerMock.Object);
-            await producerService.StartAsync(default);
-
-            var quoteEventArgs = new QuoteReceivedEventArgs(new Quote("BNBBTC", Enumerable.Empty<Level>(), Enumerable.Empty<Level>()));
-            exchangeClientMock.Raise(x => x.QuoteReceived += null, quoteEventArgs);
-
-            producerMock.Verify();
-            sentQuote.ShouldNotBeNull();
-            sentQuote.ShouldSatisfyAllConditions(x =>
-            {
-                x.Symbol.ShouldBe("BNBBTC");
-                x.Bids.ShouldBeEmpty();
-                x.Asks.ShouldBeEmpty();
-            });
         }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace DepthQuotesConsumer.Controllers
 {
@@ -27,14 +28,14 @@ namespace DepthQuotesConsumer.Controllers
         /// <summary> Get depth quotes in WebSocket connection. </summary>
         /// <param name="symbol"> Symbol in any case. </param>
         [Route("/ws/depthquotes")]
-        public async Task GetQuotes()
+        public async Task GetQuotes(CancellationToken cancellationToken)
         {
             _logger.LogInformation("WS request received");
 
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 _webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                _consumer.QuoteReceived += QuoteReceived;
+                await _consumer.ConnectAsync(QuoteReceived, HttpContext.RequestAborted);
                 while (!HttpContext.RequestAborted.IsCancellationRequested)
                 {
                     // keep connection alive until it is closed
@@ -46,13 +47,13 @@ namespace DepthQuotesConsumer.Controllers
             }
         }
 
-        private void QuoteReceived(object? sender, QuoteReceivedEventArgs args)
+        private void QuoteReceived(Quote quote)
         {
             Task.Run(() =>
             {
                 // Explanation: Producer serializes Quotes to json, consumer obtains and deserializes then serializes again.
                 // Producer could send it in json format and consumer could send it as is but in real projects it is highly likely to make convertations, add logic and etc.
-                var webApiQuotes = args.Quote.ToWebApiQuote();
+                var webApiQuotes = quote.ToWebApiQuote();
                 var serializedBytes = JsonSerializer.SerializeToUtf8Bytes(webApiQuotes);
 
                 // _webSocket is marked by ! because it has been already created before subscribing the event
@@ -75,7 +76,7 @@ namespace DepthQuotesConsumer.Controllers
 
             if (disposing)
             {
-                _consumer.QuoteReceived -= QuoteReceived;
+                Task.Run(() => _consumer.CloseConnectionAsync()).ConfigureAwait(false);
             }
 
             _webSocket?.Dispose();

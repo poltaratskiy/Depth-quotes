@@ -1,5 +1,4 @@
-﻿using Abstractions.ProducerConsumerDto;
-using Abstractions.Interfaces;
+﻿using Abstractions.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,22 +21,15 @@ namespace DepthQuotesProducer.Services
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await _producer.ConnectAsync(cancellationToken);
-            _exchangeClient.QuoteReceived += QuoteReceived;
-            await _exchangeClient.ConnectAsync(cancellationToken);
+            await _exchangeClient.ConnectAsync((quote) => _producer.SendQuoteAsync(quote, cancellationToken), cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _exchangeClient.QuoteReceived -= QuoteReceived;
             await _exchangeClient.CloseConnectionAsync(cancellationToken);
             await _producer.CloseConnectionAsync(cancellationToken);
 
             _logger.LogInformation("Connections closed");
-        }
-
-        private void QuoteReceived(object? sender, QuoteReceivedEventArgs e)
-        {
-            _producer.SendQuoteAsync(e.Quote, default).ConfigureAwait(false);
         }
     }
 }

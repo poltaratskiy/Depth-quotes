@@ -27,14 +27,7 @@ namespace DepthQuotesProducer.Binance
             client = new ClientWebSocket();
         }
 
-        public event EventHandler<QuoteReceivedEventArgs>? QuoteReceived;
-
-        protected virtual void OnQuoteReceived(QuoteReceivedEventArgs quoteReceivedEventArgs)
-        {
-            QuoteReceived?.Invoke(this, quoteReceivedEventArgs);
-        }
-
-        public async Task ConnectAsync(CancellationToken cancellationToken)
+        public async Task ConnectAsync(Func<Quote, Task> quoteReceived, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Symbol in config is {0}", _symbolsConfiguration.Symbol);
             var url = urlTemplate.Replace("<SYMBOL>", _symbolsConfiguration.Symbol.ToLower());
@@ -61,12 +54,12 @@ namespace DepthQuotesProducer.Binance
 
                     try
                     {
-                        var binanceQuote = JsonConvert.DeserializeObject<Quote>(receivedJson);
+                        var binanceQuote = JsonConvert.DeserializeObject<BinanceQuote>(receivedJson);
 
                         if (binanceQuote != null)
                         {
-                            var args = new QuoteReceivedEventArgs(binanceQuote.ToAbstractionsQuote(_symbolsConfiguration.Symbol));
-                            OnQuoteReceived(args);
+                            var quote = binanceQuote.ToAbstractionsQuote(_symbolsConfiguration.Symbol);
+                            await quoteReceived(quote);
                         }
                     }
                     catch (JsonReaderException)

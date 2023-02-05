@@ -27,7 +27,7 @@ namespace DepthQuotesProducer.Tests.MappingFromBinance
                 new decimal[] { 0.01618900M, 0.37600000M },
             };
 
-            var binanceQuote = new Binance.Quote(123, binanceBids, binanceAsks);
+            var binanceQuote = new Binance.BinanceQuote(123, binanceBids, binanceAsks);
 
             var expectedBids = new Level[]
             {

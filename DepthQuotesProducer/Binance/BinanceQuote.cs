@@ -2,15 +2,15 @@
 
 namespace DepthQuotesProducer.Binance
 {
-    public class Quote
+    public class BinanceQuote
     {
 #nullable disable
-        public Quote()
+        public BinanceQuote()
         {
         }
 #nullable enable
 
-        public Quote (long lastUpdateId, IEnumerable<decimal[]> bids, IEnumerable<decimal[]> asks)
+        public BinanceQuote (long lastUpdateId, IEnumerable<decimal[]> bids, IEnumerable<decimal[]> asks)
         {
             LastUpdateId = lastUpdateId;
             Bids = bids;

@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using NATS.Client;
 using System;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DepthQuotesConsumer
 {
@@ -14,10 +16,10 @@ namespace DepthQuotesConsumer
         /* First I wanted to use _connection and _subscription as static fields and use lock construction to ensure it creates only once
          * but NatsConsumer is declared as singleton in Startup configuration so it is no nessessary to use lock. */
         private readonly IConnectionFactory _connectionFactory;
-        private readonly IConnection _connection;
-        private readonly IAsyncSubscription _subscription;
         private readonly ILogger _logger;
         private readonly NatsConfiguration _natsConfiguration;
+        private IConnection? _connection;
+        private IAsyncSubscription? _subscription;
 
         private bool _disposed;
 
@@ -25,8 +27,12 @@ namespace DepthQuotesConsumer
         {
             _logger = logger;
             _natsConfiguration = natsConfigurationOptions.Value;
-
             _connectionFactory = connectionFactory;
+        }
+
+        /// <inheritdoc/>
+        public Task ConnectAsync(Action<Quote> quoteReceived, CancellationToken cancellationToken = default)
+        {
             _connection = _connectionFactory.CreateConnection(_natsConfiguration.Url);
             _logger.LogInformation("Connected to Nats");
 
@@ -36,18 +42,29 @@ namespace DepthQuotesConsumer
 
                 if (quote != null)
                 {
-                    OnQuoteReceived(new QuoteReceivedEventArgs(quote));
+                    quoteReceived.Invoke(quote);
                 }
             });
             _subscription.Start();
             _logger.LogInformation("Subscribed to Nats");
+
+            return Task.CompletedTask;
         }
 
-        public event EventHandler<QuoteReceivedEventArgs>? QuoteReceived;
-
-        protected virtual void OnQuoteReceived(QuoteReceivedEventArgs quoteReceivedEventArgs)
+        /// <inheritdoc/>
+        public Task CloseConnectionAsync(CancellationToken cancellationToken = default)
         {
-            QuoteReceived?.Invoke(this, quoteReceivedEventArgs);
+            // this method is idempotent
+            _subscription?.Unsubscribe();
+            if (_connection != null)
+            {
+                _connection.Close();
+                _connection.Dispose();
+
+                _logger?.LogInformation("Connection to Nats closed");
+            }
+
+            return Task.CompletedTask;
         }
 
         public void Dispose()
@@ -75,15 +92,11 @@ namespace DepthQuotesConsumer
                 // dispose managed state (managed objects). No need to dispose managed object because there are object resolved with DI.
             }
 
-            // free unmanaged resources (unmanaged objects) and override a finalizer below.
-            // set large fields to null.
-            _subscription?.Unsubscribe();
-            if (_connection != null)
+            if (_connection != null && _subscription != null)
             {
-                _connection.Close();
-                _connection.Dispose();
-
-                _logger.LogInformation("Connection to Nats closed");
+                Task.Run(() => CloseConnectionAsync().ConfigureAwait(false));
+                // free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // set large fields to null.
             }
 
             _disposed = true;

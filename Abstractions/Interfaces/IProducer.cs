@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace Abstractions.Interfaces
 {
-    /// <summary> Producer that sends quotes to streams. </summary>
+    /// <summary> Producer sends quotes to streams. </summary>
     public interface IProducer
     {
-        /// <summary> Open connection to server. </summary>
+        /// <summary> Open connection to the server. </summary>
         /// <param name="cancellationToken"> Cancellation token. </param>
         /// <returns> Task. </returns>
         public Task ConnectAsync(CancellationToken cancellationToken = default);

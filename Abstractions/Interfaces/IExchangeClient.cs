@@ -9,12 +9,10 @@ namespace Abstractions.Interfaces
     public interface IExchangeClient
     {
         /// <summary> Connect to exchange and start to raise events. </summary>
+        /// <param name="quoteReceived"> Delegate invoked when quote is received. </param>
         /// <param name="cancellationToken"> Cancellation token. </param>
         /// <returns> Task. </returns>
-        public Task ConnectAsync(CancellationToken cancellationToken = default);
-
-        /// <summary> Event related to obtaining quotes. </summary>
-        public event EventHandler<QuoteReceivedEventArgs>? QuoteReceived;
+        public Task ConnectAsync(Func<Quote, Task> quoteReceived, CancellationToken cancellationToken = default);
 
         /// <summary> Close connection and stop raising events. </summary>
         /// <param name="cancellationToken"> Cancellation token. </param>

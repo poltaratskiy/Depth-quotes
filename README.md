@@ -29,6 +29,29 @@ Client app:
 * choose naming right
 * take attention to code structure and code quality
 
+### Setting up
+
+Change interested symbol in docker-compose.yaml
+```
+      - Symbols__Symbol=ETHBTC
+```
+
+### Building
+
+To build containers, run:
+
+```
+docker-compose build
+```
+
+### Running
+
+To start the services, run:
+
+```
+docker-compose up
+```
+
 ### Architecture
 
 ![alt text](ArchitectureDiagram.png)

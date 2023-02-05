@@ -42,7 +42,7 @@ namespace DepthQuotesConsumer
             services.Configure<NatsConfiguration>(Configuration.GetSection("Nats"));
 
             services
-                .AddSingleton<IConsumer, NatsConsumer>()
+                .AddScoped<IConsumer, NatsConsumer>()
                 .AddSingleton<IConnectionFactory, ConnectionFactory>();
         }
 
