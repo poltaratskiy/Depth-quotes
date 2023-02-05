@@ -26,9 +26,8 @@ namespace DepthQuotesConsumer.Controllers
         }
 
         /// <summary> Get depth quotes in WebSocket connection. </summary>
-        /// <param name="symbol"> Symbol in any case. </param>
         [Route("/ws/depthquotes")]
-        public async Task GetQuotes(CancellationToken cancellationToken)
+        public async Task GetQuotes()
         {
             _logger.LogInformation("WS request received");
 
